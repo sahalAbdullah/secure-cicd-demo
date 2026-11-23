@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sahal Abdullah · DevOps</title>
+<style>
+  :root { --bg:#0f172a; --card:#1e293b; --text:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8; --ok:#22c55e; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; padding:24px; }
+  .wrap { max-width:860px; margin:0 auto; display:grid; gap:20px; }
+  .card { background:var(--card); border-radius:14px; padding:24px; }
+  .hero { display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+  .avatar { width:110px; height:110px; border-radius:50%; object-fit:cover; border:3px solid var(--accent); }
+  .initials { width:110px; height:110px; border-radius:50%; background:var(--accent); color:var(--bg); display:flex; align-items:center; justify-content:center; font-size:40px; font-weight:700; }
+  h1 { font-size:30px; } h2 { font-size:18px; color:var(--accent); margin-bottom:12px; }
+  .role { color:var(--accent); font-weight:600; } .muted { color:var(--muted); }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { background:#0b1220; border:1px solid #334155; padding:4px 12px; border-radius:999px; font-size:14px; }
+  .steps { list-style:none; display:grid; gap:8px; }
+  .steps li::before { content:"✔ "; color:var(--ok); font-weight:700; }
+  .meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
+  .meta div { background:#0b1220; border-radius:10px; padding:12px; }
+  .meta b { display:block; color:var(--muted); font-size:12px; text-transform:uppercase; }
+  code { color:var(--accent); }
+  a { color:var(--accent); }
+  .tag { color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section class="card hero">
+    {% if photo %}
+      <img class="avatar" src="{{ url_for('static', filename='profile.png') }}" alt="Sahal Abdullah">
+    {% else %}
+      <div class="initials">SA</div>
+    {% endif %}
+    <div>
+      <h1>Sahal Abdullah</h1>
+      <p class="role">Software &amp; DevOps Engineer · Odense, Denmark</p>
+      <p class="muted">MSc Electronics Engineering (SDU). Linux, CI/CD, Docker and security, with a background in embedded systems and AI tooling.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>This page was deployed by my pipeline</h2>
+    <ol class="steps">
+      <li>Gitleaks: secret scan on the full Git history</li>
+      <li>pytest: automated tests</li>
+      <li>Docker build: non-root image, OS security patches applied</li>
+      <li>Trivy: blocks HIGH and CRITICAL CVEs</li>
+      <li>Deploy to AWS EC2 over SSH with a dedicated deploy key</li>
+      <li>Health check on <code>/health</code></li>
+    </ol>
+    <div class="meta" style="margin-top:16px">
+      <div><b>Commit running</b><code>{{ commit }}</code></div>
+      <div><b>Container</b><code>{{ host }}</code></div>
+      <div><b>Started</b>{{ started }}</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Experience</h2>
+    <p><b>Software Research Engineer</b>, SDU Mærsk Mc-Kinney Møller Institute <span class="tag">2026 – now</span><br>
+       <span class="muted">Security analysis across services (Python, Java, gRPC); Linux servers, Docker and GitHub Actions daily.</span></p><br>
+    <p><b>Software Engineer, company project &amp; thesis</b>, Danfoss Drives <span class="tag">2025 – 2026</span><br>
+       <span class="muted">AI code review agent in the Azure DevOps CI/CD workflow; runtime data analysis on embedded communication.</span></p><br>
+    <p><b>Software Engineer</b> <span class="tag">earlier</span><br>
+       <span class="muted">Backend REST APIs in Go with SQL databases; real-time React Native event app for COP28.</span></p>
+  </section>
+
+  <section class="card">
+    <h2>Skills</h2>
+    <div class="chips">
+      <span class="chip">Linux</span><span class="chip">Bash</span><span class="chip">Python</span><span class="chip">Git</span>
+      <span class="chip">GitHub Actions</span><span class="chip">Azure DevOps</span><span class="chip">Docker</span>
+      <span class="chip">AWS EC2</span><span class="chip">SSH &amp; access control</span><span class="chip">Trivy</span>
+      <span class="chip">Gitleaks</span><span class="chip">Go</span><span class="chip">SQL</span><span class="chip">LLM APIs &amp; MCP</span>
+    </div>
+  </section>
+
+  <p class="muted" style="text-align:center">
+    <a href="https://github.com/sahalAbdullah/secure-cicd-demo">Source on GitHub</a> ·
+    <a href="https://linkedin.com/in/sahal-abdullah-237136206">LinkedIn</a> ·
+    <a href="/health">/health</a>
+  </p>
+</div>
+</body>
+</html>

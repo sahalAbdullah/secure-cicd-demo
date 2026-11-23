@@ -1,10 +1,24 @@
-from flask import Flask, jsonify
+import os
+import socket
+from datetime import datetime, timezone
+
+from flask import Flask, jsonify, render_template
 
 app = Flask(__name__)
+STARTED = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
 
 @app.get("/")
 def index():
-    return jsonify(message="Hello from the secure pipeline")
+    photo = os.path.exists(os.path.join(app.static_folder, "profile.jpg"))
+    return render_template(
+        "index.html",
+        commit=os.environ.get("GIT_SHA", "local")[:7],
+        host=socket.gethostname(),
+        started=STARTED,
+        photo=photo,
+    )
+
 
 @app.get("/health")
 def health():
