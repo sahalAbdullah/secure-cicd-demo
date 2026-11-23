@@ -10,7 +10,7 @@ STARTED = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
 @app.get("/")
 def index():
-    photo = os.path.exists(os.path.join(app.static_folder, "profile.jpg"))
+    photo = os.path.exists(os.path.join(app.static_folder, "profile.png"))
     return render_template(
         "index.html",
         commit=os.environ.get("GIT_SHA", "local")[:7],
