@@ -1,0 +1,7 @@
+.env
+*.pem
+deploy_key*
+id_*
+__pycache__/
+*.pyc
+.venv/

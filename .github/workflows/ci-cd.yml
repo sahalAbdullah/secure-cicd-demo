@@ -1,0 +1,53 @@
+name: ci-cd
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-scan-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secret scan (Gitleaks)
+        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:latest detect --source=/repo --verbose --redact
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Tests
+        run: |
+          pip install -r requirements.txt pytest
+          pytest -q
+
+      - name: Build image
+        run: docker build -t demo-app:${{ github.sha }} .
+
+      - name: Vulnerability scan (Trivy)
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest \
+            image --exit-code 1 --severity CRITICAL,HIGH --ignore-unfixed demo-app:${{ github.sha }}
+
+      - name: Deploy to EC2
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+          docker save demo-app:${{ github.sha }} | gzip | ssh -i ~/.ssh/deploy_key "$EC2_USER@$EC2_HOST" 'gunzip | docker load'
+          ssh -i ~/.ssh/deploy_key "$EC2_USER@$EC2_HOST" \
+            "docker rm -f demo-app || true && docker run -d --name demo-app --restart unless-stopped -p 80:8000 demo-app:${{ github.sha }}"
+          curl -fsS --retry 5 --retry-delay 3 "http://$EC2_HOST/health"
